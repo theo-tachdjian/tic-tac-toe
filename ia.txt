@@ -1,0 +1,35 @@
+from player import *
+from copy import *
+from random import *
+
+class Computer(Player):
+
+    def play(self, game):
+        return self.bestMove(game, game.table, game.size, self.sign)[0]
+
+    def bestMove(self, game, table, size, sign):
+        other = ("X" if sign == "O" else "O")
+        moves = list()
+
+        for x in range(size):
+            for y in range(size):
+                if table[x][y] == "*":
+                    copy = deepcopy(table)
+                    copy[x][y] = sign
+                    win = game.win(copy)
+
+                    if win == "*" and game.full(copy):
+                        score = 0
+                    elif win == sign:
+                        score = 1
+                    else:
+                        score = 0 - self.bestMove(game, copy, size, other)[1]
+                    result = ((x, y), score)
+
+                    if score == 1:
+                        return result
+                    moves.append(result)
+
+        shuffle(moves)
+        moves.sort(key=lambda move: move[1], reverse=True)
+        return moves[0]
